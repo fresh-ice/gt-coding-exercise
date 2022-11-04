@@ -54,9 +54,9 @@ def notes_detail(key):
         raise exceptions.NotFound()
     return note_repr(key)
 
-@app.route('/example/')
-def example():
-    url = 'https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/2015/10/10'
+@app.route('/pageviews/<int:year>/<int:month>/<int:day>/')
+def example(year,month,day):
+    url = f"https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/{year}/{month}/{day}"
     headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
     r = requests.get(url, headers=headers)
 
