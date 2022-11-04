@@ -4,8 +4,12 @@ from flask_api import FlaskAPI, status, exceptions
 import requests
 import json
 
+from calendar import monthrange
+
 app = FlaskAPI(__name__)
 
+# must include a humanistic user agent header because wikimedia blocks requests via script
+headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
 
 notes = {
     0: 'do the shopping',
@@ -54,17 +58,56 @@ def notes_detail(key):
         raise exceptions.NotFound()
     return note_repr(key)
 
+def validate_query_params():
+    return True
+
 @app.route('/pageviews/<int:year>/<int:month>/<int:day>/')
 def example(year,month,day):
+    
     url = f"https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/{year}/{month}/{day}"
-    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+    print(url)
     r = requests.get(url, headers=headers)
+
+    data = json.loads(r.text)["items"][0]["articles"]
+
+
 
     print(r)
 
-    data = json.loads(r.text)
 
     return data
+
+# Uses wiki's own monthly all-days endpoint, which seems to return incorrect results
+@app.route('/pageviews/monthly_native/<int:year>/<int:month>/')
+def monthly_native_totals(year,month):
+    
+    url = f"https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikisource/all-access/{year}/{month}/all-days"
+    r = requests.get(url, headers=headers)
+    try:
+        data = json.loads(r.text)["items"][0]["articles"]
+    except Exception as e:
+        return r.text
+    return data
+
+# Slow, but returns the accurate monthly total of views. Much too slow for production
+@app.route('/pageviews/monthly/<int:year>/<int:month>/')
+def monthly_totals(year,month):
+    monthmax = monthrange(year, month)[1]
+    data_aggregate = []
+    for i in range(1,monthmax+1):
+        url = f"https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/{year}/{month}/{str(i).zfill(2)}"
+        print(url)
+        r = requests.get(url, headers=headers)
+        data = json.loads(r.text)["items"][0]["articles"]
+        data_aggregate+=data
+
+    top_views = {}
+    for item in data_aggregate:
+        top_views[item["article"]] = top_views.get(item["article"], 0) + item["views"]
+
+    sorted_top_views = sorted(top_views.items(), key=lambda x: x[1], reverse=True)
+
+    return sorted_top_views
 
 
 if __name__ == "__main__":
