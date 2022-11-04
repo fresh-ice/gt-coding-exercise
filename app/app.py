@@ -1,6 +1,9 @@
 from flask import request, url_for
 from flask_api import FlaskAPI, status, exceptions
 
+import requests
+import json
+
 app = FlaskAPI(__name__)
 
 
@@ -50,6 +53,18 @@ def notes_detail(key):
     if key not in notes:
         raise exceptions.NotFound()
     return note_repr(key)
+
+@app.route('/example/')
+def example():
+    url = 'https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/2015/10/10'
+    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+    r = requests.get(url, headers=headers)
+
+    print(r)
+
+    data = json.loads(r.text)
+
+    return data
 
 
 if __name__ == "__main__":
