@@ -95,10 +95,15 @@ def monthly_totals(year,month):
     monthmax = monthrange(year, month)[1]
     data_aggregate = []
     for i in range(1,monthmax+1):
-        url = f"https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/{year}/{month}/{str(i).zfill(2)}"
+        url = f"https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/{str(year)}/{str(month).zfill(2)}/{str(i).zfill(2)}"
         print(url)
         r = requests.get(url, headers=headers)
-        data = json.loads(r.text)["items"][0]["articles"]
+        try:
+            data = json.loads(r.text)["items"][0]["articles"]
+        except Exception as e:
+            print(e)
+            return "There was an error processing this request"
+        return data
         data_aggregate+=data
 
     top_views = {}
