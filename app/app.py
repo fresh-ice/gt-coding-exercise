@@ -19,6 +19,7 @@ app = FlaskAPI(__name__)
 HEADERS = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
 # must include a user agent header because wikimedia blocks requests via script
 
+BASE_URL = "https://wikimedia.org/api/rest_v1/metrics/pageviews"
 
 '''Helper functions'''
 
@@ -89,7 +90,7 @@ def homepage():
 
 @app.route('/pageviews/all-articles/daily/<int:year>/<int:month>/<int:day>/')
 def example(year, month, day):
-    url = f"https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/{year}/{month}/{day}/"
+    url = f"{BASE_URL}/top/en.wikipedia/all-access/{year}/{month}/{day}/"
     r = requests.get(url, headers=HEADERS)
 
     data = json.loads(r.text)["items"][0]["articles"]
@@ -101,7 +102,7 @@ def example(year, month, day):
 # Uses wiki's own monthly all-days endpoint, which seems to return incorrect results
 @app.route('/pageviews/all-articles/monthly_native/<int:year>/<int:month>/')
 def monthly_native_totals(year,month):
-    url = f"https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikisource/all-access/{year}/{month}/all-days"
+    url = f"{BASE_URL}/top/en.wikisource/all-access/{year}/{month}/all-days"
     r = requests.get(url, headers=HEADERS)
     try:
         data = json.loads(r.text)["items"][0]["articles"]
@@ -117,7 +118,7 @@ def monthly_totals(year, month):
     monthmax = monthrange(year, month)[1]
     data_aggregate = []
     for i in range(1, monthmax+1):
-        url = f"https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/{str(year)}/{str(month).zfill(2)}/{str(i).zfill(2)}"
+        url = f"{BASE_URL}/top/en.wikipedia/all-access/{str(year)}/{str(month).zfill(2)}/{str(i).zfill(2)}"
         r = requests.get(url, headers=HEADERS)
         try:
             data = json.loads(r.text)["items"][0]["articles"]
@@ -142,7 +143,7 @@ def weekly_totals(year, week):
     print(date_list)
     data_aggregate = []
     for day in date_list:
-        url = f"https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/{str(day[0])}/{str(day[1]).zfill(2)}/{str(day[2]).zfill(2)}"
+        url = f"{BASE_URL}/top/en.wikipedia/all-access/{str(day[0])}/{str(day[1]).zfill(2)}/{str(day[2]).zfill(2)}"
         print("url", url)
         r = requests.get(url, headers=HEADERS)
         try:
@@ -170,7 +171,7 @@ def monthly_total_by_article(article, year, month, max_views=False):
     end_day = date_list[-1]
     date_range = f"{begin_day[0]+begin_day[1].zfill(2)+begin_day[2].zfill(2)}00/{end_day[0]+end_day[1].zfill(2)+end_day[2].zfill(2)}00"
 
-    url = f"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/all-agents/{article}/daily/{date_range}"
+    url = f"{BASE_URL}/per-article/en.wikipedia/all-access/all-agents/{article}/daily/{date_range}"
 
     r = requests.get(url, headers=HEADERS)
     try:
@@ -204,7 +205,7 @@ def weekly_total_by_article(article, year, week):
     end_day = date_list[-1]
     date_range = f"{begin_day[0]+begin_day[1].zfill(2)+begin_day[2].zfill(2)}00/{end_day[0]+end_day[1].zfill(2)+end_day[2].zfill(2)}00"
     print(date_range)
-    url = f"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/all-agents/{article}/daily/{date_range}"
+    url = f"{BASE_URL}/per-article/en.wikipedia/all-access/all-agents/{article}/daily/{date_range}"
 
     print(url)
     r = requests.get(url, headers=HEADERS)
@@ -229,13 +230,13 @@ def weekly_total_by_article(article, year, week):
 # Switch aggregators to use async, which increases performance by 21x
 @app.route('/v2/pageviews/all-articles/monthly/<int:year>/<int:month>/')
 def async_monthly_totals(year, month):
-    urls = [f"https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/{str(day[0])}/{str(day[1]).zfill(2)}/{str(day[2]).zfill(2)}" for day in getDateListFromMonth(year, month)]
+    urls = [f"{BASE_URL}/top/en.wikipedia/all-access/{str(day[0])}/{str(day[1]).zfill(2)}/{str(day[2]).zfill(2)}" for day in getDateListFromMonth(year, month)]
     return asyncio.run(aggregate_responses(urls))
 
 
 @app.route('/v2/pageviews/all-articles/weekly/<int:year>/<int:week>/')
 def async_weekly_totals(year, week):
-    urls = [f"https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/{str(day[0])}/{str(day[1]).zfill(2)}/{str(day[2]).zfill(2)}" for day in getDateListFromWeek(year, week)]
+    urls = [f"{BASE_URL}/top/en.wikipedia/all-access/{str(day[0])}/{str(day[1]).zfill(2)}/{str(day[2]).zfill(2)}" for day in getDateListFromWeek(year, week)]
     return asyncio.run(aggregate_responses(urls))
 
 
