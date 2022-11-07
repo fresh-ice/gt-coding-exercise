@@ -1,0 +1,147 @@
+{
+	"info": {
+		"_postman_id": "b9585536-1ee5-4728-96d2-3c9fa9055317",
+		"name": "GTAssess-Testing",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "v1/all-articles/monthly",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/pageviews/all-articles/monthly/2022/10/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"pageviews",
+						"all-articles",
+						"monthly",
+						"2022",
+						"10",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "v1/all-articles/weekly",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/pageviews/all-articles/weekly/2022/10/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"pageviews",
+						"all-articles",
+						"weekly",
+						"2022",
+						"10",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "v1/by-article/weekly",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/pageviews/by-article/Albert_Einstein/weekly/2022/10/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"pageviews",
+						"by-article",
+						"Albert_Einstein",
+						"weekly",
+						"2022",
+						"10",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "v1/by-article/monthly",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/pageviews/by-article/Albert_Einstein/monthly/2022/10/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"pageviews",
+						"by-article",
+						"Albert_Einstein",
+						"monthly",
+						"2022",
+						"10",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "v1/by-article/monthly/monthly_high",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/pageviews/by-article/Albert_Einstein/monthly/2022/10/monthly_high",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"pageviews",
+						"by-article",
+						"Albert_Einstein",
+						"monthly",
+						"2022",
+						"10",
+						"monthly_high"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

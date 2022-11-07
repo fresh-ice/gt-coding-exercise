@@ -31,6 +31,16 @@ def getDateListFromWeek(year,week):
         day = firstdayofweek + datetime.timedelta(days=i)
         datelist.append(str(day).split('-'))
         print(day)
+    print(datelist)
+    return datelist
+
+
+def getDateListFromMonth(year,month):
+    monthmax = monthrange(year, month)[1] 
+    datelist = []
+    for i in range(1,monthmax+1):
+        datelist.append([str(year), str(month), str(i)])
+    print(datelist)
     return datelist
 
 
@@ -116,17 +126,76 @@ def weekly_totals(year,week):
 
     return sorted_top_views
 
+@app.route('/pageviews/by-article/<string:article>/monthly/<int:year>/<int:month>/<string:max_views>')
+@app.route('/pageviews/by-article/<string:article>/monthly/<int:year>/<int:month>/')
+def monthly_total_by_article(article, year, month, max_views=False):
+    date_list = getDateListFromMonth(year, month)
+    data_aggregate = []
+    begin_day = date_list[0]
+    end_day = date_list[-1]
+    date_range = f"{begin_day[0]+begin_day[1].zfill(2)+begin_day[2].zfill(2)}00/{end_day[0]+end_day[1].zfill(2)+end_day[2].zfill(2)}00"
+    print(date_range)
+    url =f"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/all-agents/{article}/daily/{date_range}"
 
-@app.route('/pageviews/by_article/monthly/<string:article>/<int:year>/<int:month>/')
-def monthly_total_by_article(article, year,month):
-    url =f"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/all-agents/Albert_Einstein/daily/2015100100/2015103100"
-    # url = f"https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikisource/all-access/{year}/{month}/all-days"
+    print(url)
     r = requests.get(url, headers=headers)
     try:
-        data = json.loads(r.text)["items"][0]["articles"]
+        data = json.loads(r.text)["items"]
     except Exception as e:
-        return r.text
-    return data
+        print("There was an error processing upstream response", e)
+        return "There was an error processing this request"
+    data_aggregate+=data
+
+    print("dataagrerga", data_aggregate)
+
+    monthly_high = [0,0]
+    top_views = {}
+    for item in data_aggregate:
+        timestamp = item["timestamp"]
+        top_views[item["article"]] = top_views.get(item["article"], 0) + item["views"]
+        if item["views"] > monthly_high[1]:
+            monthly_high = [timestamp[:-2], item["views"]]
+
+    print(top_views)
+    sorted_top_views = sorted(top_views.items(), key=lambda x: x[1], reverse=True)
+
+
+    print("max views", max)
+    if max_views == 'monthly_high':
+        return [monthly_high]
+
+    return sorted_top_views
+
+
+@app.route('/pageviews/by-article/<string:article>/weekly/<int:year>/<int:week>/')
+def weekly_total_by_article(article, year, week):
+    date_list = getDateListFromWeek(year, week)
+    data_aggregate = []
+    begin_day = date_list[0]
+    end_day = date_list[-1]
+    date_range = f"{begin_day[0]+begin_day[1].zfill(2)+begin_day[2].zfill(2)}00/{end_day[0]+end_day[1].zfill(2)+end_day[2].zfill(2)}00"
+    print(date_range)
+    url =f"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/all-agents/{article}/daily/{date_range}"
+
+    print(url)
+    r = requests.get(url, headers=headers)
+    try:
+        data = json.loads(r.text)["items"]
+    except Exception as e:
+        print("There was an error processing upstream response", e)
+        return "There was an error processing this request"
+    data_aggregate+=data
+
+    print("dataagrerga", data_aggregate)
+
+    top_views = {}
+    for item in data_aggregate:
+        top_views[item["article"]] = top_views.get(item["article"], 0) + item["views"]
+
+    print(top_views)
+    sorted_top_views = sorted(top_views.items(), key=lambda x: x[1], reverse=True)
+    return sorted_top_views
+
 
 
 if __name__ == "__main__":
