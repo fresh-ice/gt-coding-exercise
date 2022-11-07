@@ -13,22 +13,7 @@ app = FlaskAPI(__name__)
 # must include a humanistic user agent header because wikimedia blocks requests via script
 headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
 
-
-def note_repr(key):
-    return {
-        'url': request.host_url.rstrip('/') + url_for('notes_detail', key=key),
-        'text': notes[key]
-    }
-
-
-@app.route("/", methods=['GET', 'POST'])
-def homepage():
-    """
-    Return readme here.
-    """
-    return "You are home."
-
-
+'''Helper functions'''
 def validate_query_params():
     return True
 
@@ -41,7 +26,17 @@ def getDateListFromWeek(year,week):
     return datelist
 
 
-@app.route('/pageviews/<int:year>/<int:month>/<int:day>/')
+@app.route("/", methods=['GET', 'POST'])
+def homepage():
+    """
+    Return readme here.
+    """
+    return "You are home."
+
+
+'''Routes'''
+
+@app.route('/pageviews/all-articles/daily/<int:year>/<int:month>/<int:day>/')
 def example(year,month,day):
     url = f"https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/{year}/{month}/{day}"
     print(url)
@@ -53,7 +48,7 @@ def example(year,month,day):
     return data
 
 # Uses wiki's own monthly all-days endpoint, which seems to return incorrect results
-@app.route('/pageviews/monthly_native/<int:year>/<int:month>/')
+@app.route('/pageviews/all-articles/monthly_native/<int:year>/<int:month>/')
 def monthly_native_totals(year,month):
     
     url = f"https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikisource/all-access/{year}/{month}/all-days"
@@ -65,7 +60,7 @@ def monthly_native_totals(year,month):
     return data
 
 # Slow, but returns the accurate monthly total of views. Much too slow for production
-@app.route('/pageviews/monthly/<int:year>/<int:month>/')
+@app.route('/pageviews/all-articles/monthly/<int:year>/<int:month>/')
 def monthly_totals(year,month):
     monthmax = monthrange(year, month)[1]
     data_aggregate = []
@@ -88,7 +83,7 @@ def monthly_totals(year,month):
 
     return sorted_top_views
 
-@app.route('/pageviews/weekly/<int:year>/<int:week>/')
+@app.route('/pageviews/all-articles/weekly/<int:year>/<int:week>/')
 def weekly_totals(year,week):
     
     data_aggregate = []
@@ -113,7 +108,7 @@ def weekly_totals(year,week):
     return sorted_top_views
 
 
-@app.route('/pageviews/monthly/per_article/<string:article>/<int:year>/<int:month>/')
+@app.route('/pageviews/per_article/monthly/<string:article>/<int:year>/<int:month>/')
 def monthly_total_by_article(article, year,month):
     url =f" https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/all-agents/Albert_Einstein/daily/2015100100/2015103100"
     # url = f"https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikisource/all-access/{year}/{month}/all-days"
