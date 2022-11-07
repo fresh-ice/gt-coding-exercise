@@ -16,16 +16,14 @@ import aiohttp
 app = FlaskAPI(__name__)
 
 ''' Globals '''
-HEADERS = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
-# must include a user agent header because wikimedia blocks requests via script
 
+
+# must include a user agent header because wikimedia blocks requests via script
+HEADERS = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
 BASE_URL = "https://wikimedia.org/api/rest_v1/metrics/pageviews"
 
+
 '''Helper functions'''
-
-
-def validate_query_params():
-    return True
 
 
 def getDateListFromWeek(year, week):
