@@ -10,6 +10,9 @@ import time
 
 import markdown
 
+import asyncio
+import aiohttp
+
 app = FlaskAPI(__name__)
 
 ''' Globals '''
@@ -41,7 +44,34 @@ def getDateListFromMonth(year,month):
     print(datelist)
     return datelist
 
+async def get_async(url, session):
+    try:
+        async with session.get(url=url) as response:
+            resp = await response.read()
+            return resp
+    except Exception as e:
+        print("Unable to get url {} due to {}.".format(url, e.__class__)) 
 
+
+async def aggregate_responses(urls):
+    data_aggregate = []
+
+    async with aiohttp.ClientSession() as session:
+        ret = await asyncio.gather(*[get_async(url, session) for url in urls])
+        for chunk in ret:
+            data = json.loads(chunk.decode('utf-8'))
+            print("Data is:", data)
+            data_aggregate+=data["items"][0]["articles"]
+
+        top_view = {}
+        for item in data_aggregate:
+            top_view[item["article"]] = top_view.get(item["article"], 0) + item["views"]
+
+        sorted_top_views = sorted(top_view.items(), key=lambda x: x[1], reverse=True)
+        return sorted_top_views
+
+
+'''Routes'''
 @app.route("/", methods=['GET'])
 def homepage():
     """
@@ -51,12 +81,9 @@ def homepage():
         html = markdown.markdown(f.read())  
     return html
 
-
-'''Routes'''
 @app.route('/pageviews/all-articles/daily/<int:year>/<int:month>/<int:day>/')
 def example(year,month,day):
     url = f"https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/{year}/{month}/{day}"
-    print(url)
     r = requests.get(url, headers=HEADERS)
 
     data = json.loads(r.text)["items"][0]["articles"]
@@ -189,6 +216,19 @@ def weekly_total_by_article(article, year, week):
     print(top_views)
     sorted_top_views = sorted(top_views.items(), key=lambda x: x[1], reverse=True)
     return sorted_top_views
+
+
+# Switch aggregators to use async, which increases performance by 21x
+@app.route('/v2/pageviews/all-articles/monthly/<int:year>/<int:month>/')
+def async_monthly_totals(year,month):
+    urls = [f"https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/{str(day[0])}/{str(day[1]).zfill(2)}/{str(day[2]).zfill(2)}" for day in getDateListFromMonth(year, month)]
+    return asyncio.run(aggregate_responses(urls))
+
+
+@app.route('/v2/pageviews/all-articles/weekly/<int:year>/<int:week>/')
+def async_weekly_totals(year,week):
+    urls = [f"https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/{str(day[0])}/{str(day[1]).zfill(2)}/{str(day[2]).zfill(2)}" for day in getDateListFromWeek(year, week)]
+    return asyncio.run(aggregate_responses(urls))
 
 
 if __name__ == "__main__":

@@ -1,3 +1,5 @@
 Flask-API
 requests
 markdown
+asyncio
+aiohttp
