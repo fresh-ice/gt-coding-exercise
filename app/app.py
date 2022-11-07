@@ -13,11 +13,6 @@ app = FlaskAPI(__name__)
 # must include a humanistic user agent header because wikimedia blocks requests via script
 headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
 
-notes = {
-    0: 'do the shopping',
-    1: 'build the codez',
-    2: 'paint the door',
-}
 
 def note_repr(key):
     return {
@@ -27,38 +22,12 @@ def note_repr(key):
 
 
 @app.route("/", methods=['GET', 'POST'])
-def notes_list():
+def homepage():
     """
-    List or create notes.
+    Return readme here.
     """
-    if request.method == 'POST':
-        note = str(request.data.get('text', ''))
-        idx = max(notes.keys()) + 1
-        notes[idx] = note
-        return note_repr(idx), status.HTTP_201_CREATED
+    return "You are home."
 
-    # request.method == 'GET'
-    return [note_repr(idx) for idx in sorted(notes.keys())]
-
-
-@app.route("/<int:key>/", methods=['GET', 'PUT', 'DELETE'])
-def notes_detail(key):
-    """
-    Retrieve, update or delete note instances.
-    """
-    if request.method == 'PUT':
-        note = str(request.data.get('text', ''))
-        notes[key] = note
-        return note_repr(key)
-
-    elif request.method == 'DELETE':
-        notes.pop(key, None)
-        return '', status.HTTP_204_NO_CONTENT
-
-    # request.method == 'GET'
-    if key not in notes:
-        raise exceptions.NotFound()
-    return note_repr(key)
 
 def validate_query_params():
     return True
@@ -74,17 +43,12 @@ def getDateListFromWeek(year,week):
 
 @app.route('/pageviews/<int:year>/<int:month>/<int:day>/')
 def example(year,month,day):
-    
     url = f"https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/{year}/{month}/{day}"
     print(url)
     r = requests.get(url, headers=headers)
 
     data = json.loads(r.text)["items"][0]["articles"]
-
-
-
     print(r)
-
 
     return data
 
@@ -114,7 +78,6 @@ def monthly_totals(year,month):
         except Exception as e:
             print(e)
             return "There was an error processing this request"
-        return data
         data_aggregate+=data
 
     top_views = {}
