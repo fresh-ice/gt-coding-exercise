@@ -33,6 +33,34 @@
 			"response": []
 		},
 		{
+			"name": "v2/all-articles/monthly",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/v2/pageviews/all-articles/monthly/2022/10/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"v2",
+						"pageviews",
+						"all-articles",
+						"monthly",
+						"2022",
+						"10",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "v1/all-articles/weekly",
 			"request": {
 				"method": "GET",
@@ -60,12 +88,40 @@
 			"response": []
 		},
 		{
+			"name": "v2/all-articles/weekly",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/v2/pageviews/all-articles/weekly/2022/10/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"v2",
+						"pageviews",
+						"all-articles",
+						"weekly",
+						"2022",
+						"10",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "v1/by-article/weekly",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://127.0.0.1:5000/pageviews/by-article/Albert_Einstein/weekly/2022/10/",
+					"raw": "http://127.0.0.1:5000/pageviews/by-article/Albert_Einstein/weekly/2022/21/",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -80,7 +136,7 @@
 						"Albert_Einstein",
 						"weekly",
 						"2022",
-						"10",
+						"21",
 						""
 					]
 				}
@@ -93,7 +149,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://127.0.0.1:5000/pageviews/by-article/Albert_Einstein/monthly/2022/10/",
+					"raw": "http://127.0.0.1:5000/pageviews/by-article/Albert_Einstein/monthly/2022/01/",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -108,7 +164,7 @@
 						"Albert_Einstein",
 						"monthly",
 						"2022",
-						"10",
+						"01",
 						""
 					]
 				}
